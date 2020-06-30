@@ -35,5 +35,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: bmx-${{ matrix.platform }}
+          name: bmx-${{ matrix.platform }}-${{ matrix.go-version }}
           path: bmx
