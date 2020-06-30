@@ -1,0 +1,19 @@
+name: goreleaser-lint
+on:
+  push:
+    paths:
+      - ".goreleaser.yml"
+      - .github/workflows/goreleaser.yml
+
+jobs:
+  release:
+    name: Release on GitHub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v1
+      - name: Lint goreleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          version: latest
+          args: check
