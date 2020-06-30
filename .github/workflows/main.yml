@@ -15,8 +15,9 @@ jobs:
     strategy:
       matrix:
         go-version: [1.13.x]
-        platform: [ubuntu-latest, windows-latest]
+        platform: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
+    timeout-minutes: 5
     env:
       GO111MODULE: on
     steps:
@@ -36,7 +37,14 @@ jobs:
             ${{ runner.OS }}-build-${{ env.cache-name }}-
             ${{ runner.OS }}-build-
             ${{ runner.OS }}-
+      - name: Build
+        run: go build -o bmx ./cmd/bmx/.
       - name: Vet
         run: go vet ./...
       - name: Test
         run: go test -v -covermode="count" -coverprofile="profile.cov" ./...
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: bmx-${{ matrix.platform }}-${{ matrix.go-version }}
+          path: bmx
