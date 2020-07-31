@@ -40,7 +40,7 @@ go_test(
 )
 
 nogo(
-    name = "nogo_vet",
+    name = "nogo",
     config = "nogo_config.json",
     visibility = ["//visibility:public"],
     deps = [
