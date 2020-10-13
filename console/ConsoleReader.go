@@ -3,6 +3,7 @@ package console
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"syscall"
@@ -16,7 +17,6 @@ type ConsoleReader interface {
 	ReadInt(prompt string) (int, error)
 	Print(prompt string) error
 	Println(prompt string) error
-	EnableTty()
 }
 
 type DefaultConsoleReader struct {
@@ -25,32 +25,31 @@ type DefaultConsoleReader struct {
 
 func NewConsoleReader() *DefaultConsoleReader {
 	console := &DefaultConsoleReader{
-		Tty: true,
+		Tty: false,
 	}
 	return console
 }
 
-func (r DefaultConsoleReader) EnableTty() {
-	r.Tty = true
-	fmt.Fprint(os.Stdin, r.Tty)
-}
-
 func (r *DefaultConsoleReader) Print(prompt string) error {
 	if r.Tty {
-		// fmt.Fprint(os.Stdin, "Print tty")
-		fmt.Fprint(os.Stdin, prompt)
+		tty, err := os.OpenFile("/dev/tty", os.O_RDWR|syscall.O_NOCTTY, 0)
+		if err != nil {
+			log.Fatalf("Cannot open tty port: %v\n", err)
+		}
+		fmt.Fprint(tty, prompt)
 	} else {
-		// fmt.Fprint(os.Stdin, "Print")
 		fmt.Fprint(os.Stderr, prompt)
 	}
 	return nil
 }
 func (r *DefaultConsoleReader) Println(prompt string) error {
 	if r.Tty {
-		// fmt.Fprintln(os.Stdin, "Fprintln tty")
-		fmt.Fprintln(os.Stdin, prompt)
+		tty, err := os.OpenFile("/dev/tty", os.O_RDWR|syscall.O_NOCTTY, 0)
+		if err != nil {
+			log.Fatalf("Cannot open tty port: %v\n", err)
+		}
+		fmt.Fprintln(tty, prompt)
 	} else {
-		// fmt.Fprintln(os.Stdin, "Fprintln")
 		fmt.Fprintln(os.Stderr, prompt)
 	}
 	return nil

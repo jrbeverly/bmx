@@ -37,7 +37,7 @@ var processCmd = &cobra.Command{
 		// Override the output device for the edge case
 		// of credential-process. Until a more compatible option is selected,
 		// this will be used.
-		// consolerw.EnableTty()
+		consolerw.Tty = true
 
 		mergedOptions := mergeProcessOptions(userConfig, processOptions)
 
