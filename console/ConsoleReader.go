@@ -12,24 +12,10 @@ type ConsoleReader interface {
 	ReadLine(prompt string) (string, error)
 	ReadPassword(prompt string) (string, error)
 	ReadInt(prompt string) (int, error)
-	Prompt(prompt string) error
 	Println(prompt string) error
-	Print(prompt string) error
 }
 
 type DefaultConsoleReader struct{}
-
-func (r DefaultConsoleReader) Prompt(prompt string) error {
-	outf := NewWriter()
-	fmt.Fprintln(outf, prompt)
-	return nil
-}
-
-func (r DefaultConsoleReader) Print(prompt string) error {
-	outf := NewWriter()
-	fmt.Fprint(outf, prompt)
-	return nil
-}
 
 func (r DefaultConsoleReader) Println(prompt string) error {
 	outf := NewWriter()
