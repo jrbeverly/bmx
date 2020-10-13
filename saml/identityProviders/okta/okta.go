@@ -278,6 +278,7 @@ func (o *OktaClient) doMfa(oktaAuthResponse *OktaAuthResponse) error {
 		if mfaIdx, err = o.ConsoleReader.ReadInt("Select an available MFA option: "); err != nil {
 			log.Fatal(err)
 		}
+		selectedFactor := oktaAuthResponse.Embedded.Factors[mfaIdx]
 		vurl := oktaAuthResponse.Embedded.Factors[mfaIdx].Links.Verify.Url
 
 		body := fmt.Sprintf(`{"stateToken":"%s"}`, oktaAuthResponse.StateToken)
@@ -292,19 +293,41 @@ func (o *OktaClient) doMfa(oktaAuthResponse *OktaAuthResponse) error {
 			log.Fatal(err)
 		}
 
-		var code string
-		if code, err = o.ConsoleReader.ReadLine("Code: "); err != nil {
-			log.Fatal(err)
-		}
-		body = fmt.Sprintf(`{"stateToken":"%s","passCode":"%s"}`, oktaAuthResponse.StateToken, code)
-		authResponse, err = o.HttpClient.Post(vurl, "application/json", strings.NewReader(body))
-		if err != nil {
-			log.Fatal(err)
-		}
+		if selectedFactor.FactorType == "token:software:totp" {
+			var code string
+			if code, err = o.ConsoleReader.ReadLine("Code: "); err != nil {
+				log.Fatal(err)
+			}
+			body = fmt.Sprintf(`{"stateToken":"%s","passCode":"%s"}`, oktaAuthResponse.StateToken, code)
+			authResponse, err = o.HttpClient.Post(vurl, "application/json", strings.NewReader(body))
+			if err != nil {
+				log.Fatal(err)
+			}
 
-		z, _ = ioutil.ReadAll(authResponse.Body)
-		if err := json.Unmarshal(z, &oktaAuthResponse); err != nil {
-			log.Fatal(err)
+			z, _ = ioutil.ReadAll(authResponse.Body)
+			if err := json.Unmarshal(z, &oktaAuthResponse); err != nil {
+				log.Fatal(err)
+			}
+		} else if selectedFactor.FactorType == "push" {
+			verified := false
+			for !verified {
+				body = fmt.Sprintf(`{"stateToken":"%s"}`, oktaAuthResponse.StateToken)
+				authResponse, err = o.HttpClient.Post(vurl, "application/json", strings.NewReader(body))
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				z, _ = ioutil.ReadAll(authResponse.Body)
+				if err := json.Unmarshal(z, &oktaAuthResponse); err != nil {
+					log.Fatal(err)
+				}
+
+				if oktaAuthResponse.Status == "SUCCESS" {
+					verified = true
+				} else if oktaAuthResponse.Status == "MFA_CHALLENGE" || oktaAuthResponse.Status == "WAITING" {
+					time.Sleep(8 * time.Second)
+				}
+			}
 		}
 	}
 	return nil
