@@ -28,14 +28,6 @@ import (
 	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 )
 
-var (
-	AwsServiceProvider serviceProviders.ServiceProvider
-)
-
-func init() {
-	AwsServiceProvider = aws.NewAwsServiceProvider()
-}
-
 const (
 	Bash       = "bash"
 	Powershell = "powershell"
@@ -72,7 +64,8 @@ func Print(idProvider identityProviders.IdentityProvider, consolerw console.Cons
 		log.Fatal(err)
 	}
 
-	creds := AwsServiceProvider.GetCredentials(saml, printOptions.Role)
+	aws := aws.NewAwsServiceProvider(consolerw)
+	creds := aws.GetCredentials(saml, printOptions.Role)
 	command := printCommand(printOptions, creds)
 	return command
 }

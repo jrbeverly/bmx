@@ -7,6 +7,7 @@ import (
 
 	"github.com/jrbeverly/bmx/console"
 	"github.com/jrbeverly/bmx/saml/identityProviders"
+	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/jrbeverly/bmx/saml/serviceProviders"
@@ -51,7 +52,8 @@ func CredentialProcess(idProvider identityProviders.IdentityProvider, consolerw 
 		log.Fatal(err)
 	}
 
-	creds := AwsServiceProvider.GetCredentials(saml, printOptions.Role)
+	aws := aws.NewAwsServiceProvider(consolerw)
+	creds := aws.GetCredentials(saml, printOptions.Role)
 	command := credentialProcessCommand(printOptions, creds)
 	return command
 }

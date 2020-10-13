@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/jrbeverly/bmx/config"
 
@@ -38,7 +37,8 @@ var processCmd = &cobra.Command{
 		// Override the output device for the edge case
 		// of credential-process. Until a more compatible option is selected,
 		// this will be used.
-		consolerw.SetDevice(os.Stdin)
+		// consolerw.EnableTty()
+
 		mergedOptions := mergeProcessOptions(userConfig, processOptions)
 
 		oktaClient, err := okta.NewOktaClient(mergedOptions.Org, consolerw)
