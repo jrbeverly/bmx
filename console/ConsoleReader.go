@@ -30,12 +30,21 @@ func NewConsoleReader() *DefaultConsoleReader {
 	return console
 }
 
+func openTty() (*os.File, error) {
+	tty, err := os.OpenFile("/dev/tty", os.O_RDWR|syscall.O_NOCTTY, 0)
+	if err != nil {
+		return tty, err
+	}
+	return tty, nil
+}
+
 func (r *DefaultConsoleReader) Print(prompt string) error {
 	if r.Tty {
-		tty, err := os.OpenFile("/dev/tty", os.O_RDWR|syscall.O_NOCTTY, 0)
+		tty, err := openTty()
 		if err != nil {
 			log.Fatalf("Cannot open tty port: %v\n", err)
 		}
+		defer tty.Close()
 		fmt.Fprint(tty, prompt)
 	} else {
 		fmt.Fprint(os.Stderr, prompt)
@@ -44,10 +53,11 @@ func (r *DefaultConsoleReader) Print(prompt string) error {
 }
 func (r *DefaultConsoleReader) Println(prompt string) error {
 	if r.Tty {
-		tty, err := os.OpenFile("/dev/tty", os.O_RDWR|syscall.O_NOCTTY, 0)
+		tty, err := openTty()
 		if err != nil {
 			log.Fatalf("Cannot open tty port: %v\n", err)
 		}
+		defer tty.Close()
 		fmt.Fprintln(tty, prompt)
 	} else {
 		fmt.Fprintln(os.Stderr, prompt)
