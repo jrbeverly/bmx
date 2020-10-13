@@ -15,7 +15,3 @@ func NewScanner() *bufio.Scanner {
 	}
 	return bufio.NewScanner(tty)
 }
-
-func NewPromptWriter() *bufio.Writer {
-	return bufio.NewWriter(os.Stdin)
-}

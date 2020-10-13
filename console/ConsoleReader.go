@@ -2,6 +2,7 @@ package console
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"syscall"
 
@@ -13,20 +14,32 @@ type ConsoleReader interface {
 	ReadPassword(prompt string) (string, error)
 	ReadInt(prompt string) (int, error)
 	Println(prompt string) error
+	SetDevice(device *os.File)
 }
 
-type DefaultConsoleReader struct{}
+type DefaultConsoleReader struct {
+	Device *os.File
+}
+
+func NewConsoleReader() DefaultConsoleReader {
+	console := DefaultConsoleReader{
+		Device: os.Stderr,
+	}
+	return console
+}
+
+func (r DefaultConsoleReader) SetDevice(device *os.File) {
+	r.Device = device
+}
 
 func (r DefaultConsoleReader) Println(prompt string) error {
-	outf := NewPromptWriter()
-	fmt.Fprintln(outf, prompt)
+	fmt.Fprintln(r.Device, prompt)
 	return nil
 }
 
 func (r DefaultConsoleReader) ReadLine(prompt string) (string, error) {
 	scanner := NewScanner()
-	outf := NewPromptWriter()
-	fmt.Fprint(outf, prompt)
+	fmt.Fprint(r.Device, prompt)
 	var s string
 	scanner.Scan()
 	if scanner.Err() != nil {
@@ -52,8 +65,7 @@ func (r DefaultConsoleReader) ReadInt(prompt string) (int, error) {
 }
 
 func (r DefaultConsoleReader) ReadPassword(prompt string) (string, error) {
-	outf := NewPromptWriter()
-	fmt.Fprint(outf, prompt)
+	fmt.Fprint(r.Device, prompt)
 	pass, err := terminal.ReadPassword(int(syscall.Stdin))
 
 	if err != nil {

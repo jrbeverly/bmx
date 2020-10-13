@@ -16,6 +16,8 @@ limitations under the License.
 
 package mocks
 
+import "os"
+
 type ConsoleReaderMock struct{}
 
 func (r ConsoleReaderMock) ReadLine(prompt string) (string, error) {
@@ -32,4 +34,7 @@ func (r ConsoleReaderMock) ReadPassword(prompt string) (string, error) {
 
 func (r ConsoleReaderMock) Println(prompt string) error {
 	return nil
+}
+
+func (r ConsoleReaderMock) SetDevice(device *os.File) {
 }

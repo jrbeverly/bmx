@@ -37,7 +37,7 @@ var (
 )
 
 func init() {
-	ConsoleReader = console.DefaultConsoleReader{}
+	ConsoleReader = console.NewConsoleReader()
 }
 
 func getUserIfEmpty(usernameFlag string) string {

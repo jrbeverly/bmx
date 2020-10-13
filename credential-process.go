@@ -3,6 +3,7 @@ package bmx
 import (
 	"encoding/json"
 	"log"
+	"os"
 	"time"
 
 	"github.com/jrbeverly/bmx/saml/identityProviders"
@@ -42,6 +43,10 @@ func GetUserInfoFromCredentialProcessCmdOptions(printOptions CredentialProcessCm
 }
 
 func CredentialProcess(idProvider identityProviders.IdentityProvider, printOptions CredentialProcessCmdOptions) string {
+	// Only use StdIn for this case, as it is an edge-case
+	// that is still being evaluated for compatibility
+	ConsoleReader.SetDevice(os.Stdin)
+
 	printOptions.User = getUserIfEmpty(printOptions.User)
 	user := GetUserInfoFromCredentialProcessCmdOptions(printOptions)
 
