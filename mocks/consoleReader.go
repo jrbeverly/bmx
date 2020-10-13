@@ -37,6 +37,3 @@ func (r ConsoleReaderMock) Println(prompt string) error {
 func (r ConsoleReaderMock) Print(prompt string) error {
 	return nil
 }
-
-func (r ConsoleReaderMock) EnableTty() {
-}
