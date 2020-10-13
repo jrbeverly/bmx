@@ -59,6 +59,7 @@ func NewOktaClient(org string) (*OktaClient, error) {
 		HttpClient:    httpClient,
 		SessionCache:  oktaSessionStorage,
 		ConsoleReader: consoleReader,
+		Timeout:       2 * time.Second,
 	}
 
 	client.BaseUrl, _ = url.Parse(fmt.Sprintf("https://%s.okta.com/api/v1/", org))
@@ -76,6 +77,7 @@ type OktaClient struct {
 	SessionCache  SessionCache
 	ConsoleReader console.ConsoleReader
 	BaseUrl       *url.URL
+	Timeout       time.Duration
 }
 
 func (o *OktaClient) GetSaml(appLink OktaAppLink) (string, error) {
@@ -272,36 +274,38 @@ func (o *OktaClient) verifyPushMfa(oktaAuthResponse *OktaAuthResponse, selectedF
 		body := fmt.Sprintf(`{"stateToken":"%s"}`, oktaAuthResponse.StateToken)
 		authResponse, err := o.HttpClient.Post(selectedFactor.Links.Verify.Url, "application/json", strings.NewReader(body))
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		z, _ := ioutil.ReadAll(authResponse.Body)
 		if err := json.Unmarshal(z, &oktaAuthResponse); err != nil {
-			log.Fatal(err)
+			return err
 		}
 
 		if oktaAuthResponse.Status == "SUCCESS" {
 			verified = true
 		} else if oktaAuthResponse.Status == "MFA_CHALLENGE" || oktaAuthResponse.Status == "WAITING" {
-			time.Sleep(8 * time.Second)
+			time.Sleep(o.Timeout)
 		}
 	}
+
+	return nil
 }
 
 func (o *OktaClient) verifyTotpMfa(oktaAuthResponse *OktaAuthResponse, selectedFactor OktaAuthFactors) error {
-	var code string
-	if code, err := o.ConsoleReader.ReadLine("Code: "); err != nil {
-		log.Fatal(err)
+	code, err := o.ConsoleReader.ReadLine("Code: ")
+	if err != nil {
+		return err
 	}
 	body := fmt.Sprintf(`{"stateToken":"%s","passCode":"%s"}`, oktaAuthResponse.StateToken, code)
 	authResponse, err := o.HttpClient.Post(selectedFactor.Links.Verify.Url, "application/json", strings.NewReader(body))
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	z, _ := ioutil.ReadAll(authResponse.Body)
 	if err := json.Unmarshal(z, &oktaAuthResponse); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	return nil
@@ -340,7 +344,7 @@ func (o *OktaClient) doMfa(oktaAuthResponse *OktaAuthResponse) error {
 				log.Fatal(err)
 			}
 		} else if selectedFactor.FactorType == "push" {
-			err = o.verifyTotpMfa(oktaAuthResponse, selectedFactor)
+			err = o.verifyPushMfa(oktaAuthResponse, selectedFactor)
 			if err != nil {
 				log.Fatal(err)
 			}
