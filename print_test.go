@@ -46,7 +46,6 @@ func TestMonkey(t *testing.T) {
 	oktaClient := &mocks.Mokta{}
 
 	consolerw := mocks.ConsoleReaderMock{}
-	bmx.AwsServiceProvider = &mocks.AwsServiceProviderMock{}
 	output := bmx.Print(oktaClient, consolerw, options)
 
 	assertAwsTokenEnv(t, output)
@@ -61,7 +60,6 @@ func TestPShellPrint(t *testing.T) {
 	oktaClient := &mocks.Mokta{}
 
 	consolerw := mocks.ConsoleReaderMock{}
-	bmx.AwsServiceProvider = &mocks.AwsServiceProviderMock{}
 
 	output := bmx.Print(oktaClient, consolerw, options)
 
@@ -80,7 +78,6 @@ func TestBashPrint(t *testing.T) {
 	oktaClient := &mocks.Mokta{}
 
 	consolerw := mocks.ConsoleReaderMock{}
-	bmx.AwsServiceProvider = &mocks.AwsServiceProviderMock{}
 
 	output := bmx.Print(oktaClient, consolerw, options)
 

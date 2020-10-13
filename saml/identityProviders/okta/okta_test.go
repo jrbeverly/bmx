@@ -39,7 +39,8 @@ type OktaClient struct {
 }
 
 func NewOktaClient() *OktaClient {
-	client, _ := okta.NewOktaClient("test")
+	consolerw := mocks.ConsoleReaderMock{}
+	client, _ := okta.NewOktaClient("test", consolerw)
 	o := &OktaClient{
 		OktaClient:   client,
 		SessionCache: mocks.DefaultSessionCache(),
