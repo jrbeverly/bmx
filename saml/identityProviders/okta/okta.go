@@ -60,6 +60,7 @@ func NewOktaClient(org string) (*OktaClient, error) {
 		SessionCache:  oktaSessionStorage,
 		ConsoleReader: consoleReader,
 		Timeout:       2 * time.Second,
+		Retries:       15,
 	}
 
 	client.BaseUrl, _ = url.Parse(fmt.Sprintf("https://%s.okta.com/api/v1/", org))
@@ -78,6 +79,7 @@ type OktaClient struct {
 	ConsoleReader console.ConsoleReader
 	BaseUrl       *url.URL
 	Timeout       time.Duration
+	Retries       int
 }
 
 func (o *OktaClient) GetSaml(appLink OktaAppLink) (string, error) {
@@ -270,7 +272,7 @@ func removeExpiredOktaSessions(sourceCaches []file.OktaSessionCache) []file.Okta
 
 func (o *OktaClient) verifyPushMfa(oktaAuthResponse *OktaAuthResponse, selectedFactor OktaAuthFactors) error {
 	verified := false
-	for !verified {
+	for retry := 0; retry < o.Retries; retry++ {
 		body := fmt.Sprintf(`{"stateToken":"%s"}`, oktaAuthResponse.StateToken)
 		authResponse, err := o.HttpClient.Post(selectedFactor.Links.Verify.Url, "application/json", strings.NewReader(body))
 		if err != nil {
@@ -284,9 +286,14 @@ func (o *OktaClient) verifyPushMfa(oktaAuthResponse *OktaAuthResponse, selectedF
 
 		if oktaAuthResponse.Status == "SUCCESS" {
 			verified = true
+			break
 		} else if oktaAuthResponse.Status == "MFA_CHALLENGE" || oktaAuthResponse.Status == "WAITING" {
 			time.Sleep(o.Timeout)
 		}
+	}
+
+	if !verified {
+		return fmt.Errorf("Failed to verify challenge within timeout window.")
 	}
 
 	return nil
