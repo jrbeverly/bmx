@@ -18,14 +18,14 @@ type ConsoleReader interface {
 type DefaultConsoleReader struct{}
 
 func (r DefaultConsoleReader) Println(prompt string) error {
-	outf := NewWriter()
+	outf := NewPromptWriter()
 	fmt.Fprintln(outf, prompt)
 	return nil
 }
 
 func (r DefaultConsoleReader) ReadLine(prompt string) (string, error) {
 	scanner := NewScanner()
-	outf := NewWriter()
+	outf := NewPromptWriter()
 	fmt.Fprint(outf, prompt)
 	var s string
 	scanner.Scan()
@@ -52,7 +52,7 @@ func (r DefaultConsoleReader) ReadInt(prompt string) (int, error) {
 }
 
 func (r DefaultConsoleReader) ReadPassword(prompt string) (string, error) {
-	outf := NewWriter()
+	outf := NewPromptWriter()
 	fmt.Fprint(outf, prompt)
 	pass, err := terminal.ReadPassword(int(syscall.Stdin))
 
