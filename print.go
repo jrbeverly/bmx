@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/jrbeverly/bmx/console"
 	"github.com/jrbeverly/bmx/saml/identityProviders"
 
 	"github.com/aws/aws-sdk-go/service/sts"
@@ -62,11 +63,11 @@ func GetUserInfoFromPrintCmdOptions(printOptions PrintCmdOptions) serviceProvide
 	return user
 }
 
-func Print(idProvider identityProviders.IdentityProvider, printOptions PrintCmdOptions) string {
-	printOptions.User = getUserIfEmpty(printOptions.User)
+func Print(idProvider identityProviders.IdentityProvider, consolerw console.ConsoleReader, printOptions PrintCmdOptions) string {
+	printOptions.User = getUserIfEmpty(consolerw, printOptions.User)
 	user := GetUserInfoFromPrintCmdOptions(printOptions)
 
-	saml, err := authenticate(user, idProvider)
+	saml, err := authenticate(user, idProvider, consolerw)
 	if err != nil {
 		log.Fatal(err)
 	}

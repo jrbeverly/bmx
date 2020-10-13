@@ -46,7 +46,7 @@ var processCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		command := bmx.CredentialProcess(oktaClient, mergedOptions)
+		command := bmx.CredentialProcess(oktaClient, consolerw, mergedOptions)
 		fmt.Println(command)
 	},
 }

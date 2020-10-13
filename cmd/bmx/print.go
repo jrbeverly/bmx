@@ -57,7 +57,7 @@ var printCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		command := bmx.Print(oktaClient, mergedOptions)
+		command := bmx.Print(oktaClient, consolerw, mergedOptions)
 		fmt.Println(command)
 	},
 }

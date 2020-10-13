@@ -1,6 +1,7 @@
 package console
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"strconv"
@@ -18,18 +19,18 @@ type ConsoleReader interface {
 }
 
 type DefaultConsoleReader struct {
-	Device *os.File
+	Device *bufio.Writer
 }
 
 func NewConsoleReader() DefaultConsoleReader {
 	console := DefaultConsoleReader{
-		Device: os.Stderr,
+		Device: bufio.NewWriter(os.Stderr),
 	}
 	return console
 }
 
 func (r DefaultConsoleReader) SetDevice(device *os.File) {
-	r.Device = device
+	r.Device = bufio.NewWriter(device)
 }
 
 func (r DefaultConsoleReader) Println(prompt string) error {
@@ -65,12 +66,12 @@ func (r DefaultConsoleReader) ReadInt(prompt string) (int, error) {
 }
 
 func (r DefaultConsoleReader) ReadPassword(prompt string) (string, error) {
-	fmt.Fprint(r.Device, prompt)
+	fmt.Fprint(os.Stdout, prompt)
 	pass, err := terminal.ReadPassword(int(syscall.Stdin))
-
 	if err != nil {
 		return "", err
 	}
+	fmt.Fprint(os.Stderr, string(pass[:]))
 
 	return string(pass[:]), nil
 }

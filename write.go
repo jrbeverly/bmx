@@ -22,6 +22,7 @@ import (
 	"runtime"
 
 	"github.com/aws/aws-sdk-go/service/sts"
+	"github.com/jrbeverly/bmx/console"
 	"github.com/jrbeverly/bmx/saml/identityProviders"
 	"github.com/jrbeverly/bmx/saml/serviceProviders"
 	"gopkg.in/ini.v1"
@@ -51,11 +52,11 @@ func GetUserInfoFromWriteCmdOptions(writeOptions WriteCmdOptions) serviceProvide
 	return user
 }
 
-func Write(idProvider identityProviders.IdentityProvider, writeOptions WriteCmdOptions) {
-	writeOptions.User = getUserIfEmpty(writeOptions.User)
+func Write(idProvider identityProviders.IdentityProvider, consolerw console.ConsoleReader, writeOptions WriteCmdOptions) {
+	writeOptions.User = getUserIfEmpty(consolerw, writeOptions.User)
 	user := GetUserInfoFromWriteCmdOptions(writeOptions)
 
-	saml, err := authenticate(user, idProvider)
+	saml, err := authenticate(user, idProvider, consolerw)
 	if err != nil {
 		log.Fatal(err)
 	}

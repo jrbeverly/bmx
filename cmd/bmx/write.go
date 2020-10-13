@@ -59,7 +59,7 @@ var writeCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		bmx.Write(oktaClient, mergedOptions)
+		bmx.Write(oktaClient, consolerw, mergedOptions)
 	},
 }
 
