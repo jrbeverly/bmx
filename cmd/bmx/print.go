@@ -17,8 +17,8 @@ limitations under the License.
 package main
 
 import (
-	"log"
 	"fmt"
+	"log"
 
 	"github.com/jrbeverly/bmx/config"
 
@@ -52,7 +52,7 @@ var printCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		mergedOptions := mergePrintOptions(userConfig, printOptions)
 
-		oktaClient, err := okta.NewOktaClient(mergedOptions.Org)
+		oktaClient, err := okta.NewOktaClient(mergedOptions.Org, consolerw)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/jrbeverly/bmx/config"
 
@@ -34,9 +35,13 @@ var processCmd = &cobra.Command{
 	Short: "Credentials to awscli",
 	Long:  `Supply the credentials in compatible format`,
 	Run: func(cmd *cobra.Command, args []string) {
+		// Override the output device for the edge case
+		// of credential-process. Until a more compatible option is selected,
+		// this will be used.
+		consolerw.SetDevice(os.Stdin)
 		mergedOptions := mergeProcessOptions(userConfig, processOptions)
 
-		oktaClient, err := okta.NewOktaClient(mergedOptions.Org)
+		oktaClient, err := okta.NewOktaClient(mergedOptions.Org, consolerw)
 		if err != nil {
 			log.Fatal(err)
 		}

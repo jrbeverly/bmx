@@ -54,7 +54,7 @@ var writeCmd = &cobra.Command{
 	Long:  "Write to aws credential file",
 	Run: func(cmd *cobra.Command, args []string) {
 		mergedOptions := MergeWriteCmdOptions(userConfig, writeOptions)
-		oktaClient, err := okta.NewOktaClient(mergedOptions.Org)
+		oktaClient, err := okta.NewOktaClient(mergedOptions.Org, consolerw)
 		if err != nil {
 			log.Fatal(err)
 		}
