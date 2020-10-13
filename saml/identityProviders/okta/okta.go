@@ -338,6 +338,10 @@ func (o *OktaClient) doMfa(oktaAuthResponse *OktaAuthResponse) error {
 			log.Fatal(err)
 		}
 
+		// This is a rough outline and can be better organized. For now
+		// I'm comfortable with adding in this kind of handling for
+		// multiple MFA factors. I'd like for this to be done in a
+		// mapped action form (e.g. actions[factortype] => perform action)
 		if selectedFactor.FactorType == "token:software:totp" {
 			err = o.verifyTotpMfa(oktaAuthResponse, selectedFactor)
 			if err != nil {
