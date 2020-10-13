@@ -23,6 +23,7 @@ import (
 	"github.com/jrbeverly/bmx/config"
 
 	"github.com/jrbeverly/bmx/saml/identityProviders/okta"
+	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 
 	"github.com/jrbeverly/bmx"
 	"github.com/spf13/cobra"
@@ -57,7 +58,8 @@ var printCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		command := bmx.Print(oktaClient, consolerw, mergedOptions)
+		awsProvider := aws.NewAwsServiceProvider(consolerw)
+		command := bmx.Print(oktaClient, awsProvider, consolerw, mergedOptions)
 		fmt.Println(command)
 	},
 }

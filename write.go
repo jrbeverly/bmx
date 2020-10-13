@@ -25,7 +25,6 @@ import (
 	"github.com/jrbeverly/bmx/console"
 	"github.com/jrbeverly/bmx/saml/identityProviders"
 	"github.com/jrbeverly/bmx/saml/serviceProviders"
-	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 	"gopkg.in/ini.v1"
 )
 
@@ -51,7 +50,7 @@ func GetUserInfoFromWriteCmdOptions(writeOptions WriteCmdOptions) serviceProvide
 	return user
 }
 
-func Write(idProvider identityProviders.IdentityProvider, consolerw console.ConsoleReader, writeOptions WriteCmdOptions) {
+func Write(idProvider identityProviders.IdentityProvider, awsProvider serviceProviders.ServiceProvider, consolerw console.ConsoleReader, writeOptions WriteCmdOptions) {
 	writeOptions.User = getUserIfEmpty(consolerw, writeOptions.User)
 	user := GetUserInfoFromWriteCmdOptions(writeOptions)
 
@@ -60,8 +59,7 @@ func Write(idProvider identityProviders.IdentityProvider, consolerw console.Cons
 		log.Fatal(err)
 	}
 
-	aws := aws.NewAwsServiceProvider(consolerw)
-	creds := aws.GetCredentials(saml, writeOptions.Role)
+	creds := awsProvider.GetCredentials(saml, writeOptions.Role)
 	writeToAwsCredentials(creds, writeOptions.Profile, resolvePath(writeOptions.Output))
 }
 

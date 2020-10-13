@@ -22,6 +22,7 @@ import (
 
 	"github.com/jrbeverly/bmx"
 	"github.com/jrbeverly/bmx/mocks"
+	awsmocks "github.com/jrbeverly/bmx/saml/serviceProviders/aws/mocks"
 )
 
 func assertAwsTokenEnv(t *testing.T, output string) {
@@ -46,7 +47,9 @@ func TestMonkey(t *testing.T) {
 	oktaClient := &mocks.Mokta{}
 
 	consolerw := mocks.ConsoleReaderMock{}
-	output := bmx.Print(oktaClient, consolerw, options)
+	awsProvider := awsmocks.AwsServiceProviderMock{}
+
+	output := bmx.Print(oktaClient, awsProvider, consolerw, options)
 
 	assertAwsTokenEnv(t, output)
 }
@@ -60,8 +63,9 @@ func TestPShellPrint(t *testing.T) {
 	oktaClient := &mocks.Mokta{}
 
 	consolerw := mocks.ConsoleReaderMock{}
+	awsProvider := awsmocks.AwsServiceProviderMock{}
 
-	output := bmx.Print(oktaClient, consolerw, options)
+	output := bmx.Print(oktaClient, awsProvider, consolerw, options)
 
 	assertAwsTokenEnv(t, output)
 	if !strings.Contains(output, "$env:") {
@@ -78,8 +82,9 @@ func TestBashPrint(t *testing.T) {
 	oktaClient := &mocks.Mokta{}
 
 	consolerw := mocks.ConsoleReaderMock{}
+	awsProvider := awsmocks.AwsServiceProviderMock{}
 
-	output := bmx.Print(oktaClient, consolerw, options)
+	output := bmx.Print(oktaClient, awsProvider, consolerw, options)
 
 	assertAwsTokenEnv(t, output)
 	if !strings.Contains(output, "export ") {

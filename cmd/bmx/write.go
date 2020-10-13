@@ -21,6 +21,7 @@ import (
 
 	"github.com/jrbeverly/bmx/config"
 	"github.com/jrbeverly/bmx/saml/identityProviders/okta"
+	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 
 	"github.com/jrbeverly/bmx"
 	"github.com/spf13/cobra"
@@ -59,7 +60,8 @@ var writeCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		bmx.Write(oktaClient, consolerw, mergedOptions)
+		awsProvider := aws.NewAwsServiceProvider(consolerw)
+		bmx.Write(oktaClient, awsProvider, consolerw, mergedOptions)
 	},
 }
 

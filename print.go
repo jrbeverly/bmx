@@ -25,7 +25,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/service/sts"
 	"github.com/jrbeverly/bmx/saml/serviceProviders"
-	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 )
 
 const (
@@ -55,7 +54,7 @@ func GetUserInfoFromPrintCmdOptions(printOptions PrintCmdOptions) serviceProvide
 	return user
 }
 
-func Print(idProvider identityProviders.IdentityProvider, consolerw console.ConsoleReader, printOptions PrintCmdOptions) string {
+func Print(idProvider identityProviders.IdentityProvider, awsProvider serviceProviders.ServiceProvider, consolerw console.ConsoleReader, printOptions PrintCmdOptions) string {
 	printOptions.User = getUserIfEmpty(consolerw, printOptions.User)
 	user := GetUserInfoFromPrintCmdOptions(printOptions)
 
@@ -64,8 +63,7 @@ func Print(idProvider identityProviders.IdentityProvider, consolerw console.Cons
 		log.Fatal(err)
 	}
 
-	aws := aws.NewAwsServiceProvider(consolerw)
-	creds := aws.GetCredentials(saml, printOptions.Role)
+	creds := awsProvider.GetCredentials(saml, printOptions.Role)
 	command := printCommand(printOptions, creds)
 	return command
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/jrbeverly/bmx/config"
 
 	"github.com/jrbeverly/bmx/saml/identityProviders/okta"
+	"github.com/jrbeverly/bmx/saml/serviceProviders/aws"
 
 	"github.com/jrbeverly/bmx"
 	"github.com/spf13/cobra"
@@ -46,7 +47,9 @@ var processCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		command := bmx.CredentialProcess(oktaClient, consolerw, mergedOptions)
+		awsProvider := aws.NewAwsServiceProvider(consolerw)
+
+		command := bmx.CredentialProcess(oktaClient, awsProvider, consolerw, mergedOptions)
 		fmt.Println(command)
 	},
 }

@@ -24,7 +24,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jrbeverly/bmx/mocks"
+	globalmocks "github.com/jrbeverly/bmx/mocks"
 	"github.com/jrbeverly/bmx/saml/identityProviders/okta"
 	"github.com/jrbeverly/bmx/saml/identityProviders/okta/file"
 	"github.com/jrbeverly/bmx/saml/identityProviders/okta/mocks"
@@ -40,7 +40,7 @@ type OktaClient struct {
 }
 
 func NewOktaClient() *OktaClient {
-	consolerw := mocks.ConsoleReaderMock{}
+	consolerw := globalmocks.ConsoleReaderMock{}
 	client, _ := okta.NewOktaClient("test", consolerw)
 	o := &OktaClient{
 		OktaClient:   client,
